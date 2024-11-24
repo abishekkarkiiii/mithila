@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Approve Doctors</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .container {
+            margin-top: 50px;
+        }
+
+        h1, h2 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        table {
+            margin-top: 20px;
+        }
+
+        th, td {
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        .approve {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .reject {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            table {
+                font-size: 0.9rem;
+            }
+
+            .btn {
+                padding: 6px 10px;
+                font-size: 0.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Admin Dashboard</h1>
+    <h2>Pending Creators Approvals</h2>
+    <div class="table-responsive">
+        <table class="table table-striped table-hover" id="doctorTable">
+            <thead class="table-dark">
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Choose</th>
+            </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        fetch('/useraccount/getALLRequest')
+            .then(response => response.json())
+            .then(doctors => {
+                console.log(doctors)
+                const doctorTableBody = document.getElementById('doctorTable').querySelector('tbody');
+                doctors.forEach(doctor => {
+                    const row = document.createElement('tr');
+                    row.dataset.id = doctor.id; // Add a unique ID for the row
+                    row.innerHTML = `
+                        <td>${doctor.name}</td>
+                        <td>${doctor.email}</td>
+                        <td>
+                            <button class="btn approve btn-sm" data-id="${doctor.id}">Approve</button>
+                            <button class="btn reject btn-sm" data-id="${doctor.id}">Reject</button>
+                        </td>
+                    `;
+                    doctorTableBody.appendChild(row);
+                });
+
+                // Add event listeners for approve and reject buttons
+                document.querySelectorAll('.approve').forEach(button => {
+                    button.addEventListener('click', function () {
+                        removeRow(this);
+                    });
+                });
+
+                document.querySelectorAll('.reject').forEach(button => {
+                    button.addEventListener('click', function () {
+                        removeRow(this);
+                    });
+                });
+            })
+            .catch(error => console.error('Error fetching doctors:', error));
+    });
+
+    function removeRow(buttonElement) {
+        const row = buttonElement.closest('tr'); // Find the closest row to the clicked button
+        row.remove(); // Remove the row from the table
+    }
+</script>
+
+</body>
+</html>
